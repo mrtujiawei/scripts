@@ -1,12 +1,25 @@
-import { webpack } from 'webpack';
-import getConfig from './webpack';
+import { Command } from 'commander';
+import { getUmdConfig, getUmdLibConfig } from './webpack';
+import start from './start';
+import build from './build';
 
-const config = getConfig();
-
-webpack(config, (err, stats) => {
-  if (err) {
-    console.log(err.stack);
-  } else {
-    console.log(stats?.toString());
-  }
-});
+new Command('t-scripts')
+  .addCommand(new Command('start'))
+  .action(() => {
+    start(getUmdConfig());
+  })
+  .addCommand(
+    new Command('build')
+      .option('--mode <mode>', 'development | production')
+      .action(({ mode }: { mode?: string }) => {
+        build(getUmdConfig(mode));
+      })
+      .addCommand(
+        new Command('lib')
+          .option('--mode <mode>', 'development | production')
+          .action(({ mode }: { mode?: string }) => {
+            build(getUmdLibConfig(mode));
+          })
+      )
+  )
+  .parse();
