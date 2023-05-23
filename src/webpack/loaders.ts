@@ -36,7 +36,7 @@ export const BabelLoader: Rule = {
         '@babel/preset-env',
         {
           useBuiltIns: 'usage',
-          corejs: '3.19.1',
+          corejs: '3.30.2',
         },
       ],
       [
@@ -54,8 +54,6 @@ export const BabelLoader: Rule = {
           proposals: true,
         },
       ],
-      // 支持顶层 await
-      ['@babel/plugin-syntax-top-level-await'],
     ],
   },
 };

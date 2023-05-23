@@ -30,8 +30,8 @@ export const WARN_FILE_SIZE = 5 * 1024 * 1024;
  */
 export const sourceMap = true;
 
-export const chunkFilename = '[content:10]';
-export const fileName = '[name]:[content:10]';
+export const chunkFilename = '[contenthash:10]';
+export const filename = `[name].${chunkFilename}`;
 
 /**
  * 最少支持的范围
