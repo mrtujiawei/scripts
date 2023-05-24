@@ -20,7 +20,7 @@ const getLibName = (libName: string) => {
 };
 
 const getOutputPath = (outputPath: string) => {
-  return absolutePath(outputPath || '');
+  return absolutePath(outputPath || 'dist');
 };
 
 export const getLibEnv = (mode?: string) => {
