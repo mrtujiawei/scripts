@@ -1,5 +1,6 @@
 import path from 'path';
 import { MODE } from '../enums';
+import { createHash } from 'crypto';
 
 export const absolutePath = (...paths: string[]) => {
   return path.resolve(process.cwd(), ...paths);
@@ -27,10 +28,21 @@ export const getLibEnv = (mode?: string) => {
   const config = require(absolutePath('package.json'))['#buildConfig'];
 
   return {
-    mode: getMode(mode || config.mode),
+    mode: getMode(mode || config?.mode),
     libName: getLibName(config.libName),
     outputDir: getOutputPath(config.outputPath),
   };
+};
+
+export const getPublicPath = (publicPath?: string) => {
+  return publicPath || '/';
+};
+
+export const createEnvironmentHash = (env: ReturnType<typeof getUmdEnv>) => {
+  const hash = createHash('md5');
+  hash.update(JSON.stringify(env));
+
+  return hash.digest('hex');
 };
 
 export const getUmdEnv = (mode?: string) => {
@@ -39,5 +51,7 @@ export const getUmdEnv = (mode?: string) => {
   return {
     mode: getMode(mode || config?.mode),
     outputDir: getOutputPath(config?.outputPath),
+    publicPath: getPublicPath(config?.publicPath),
+    cacheDirectory: absolutePath('node_modules/.cache'),
   };
 };

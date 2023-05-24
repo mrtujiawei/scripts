@@ -10,7 +10,8 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
-import { absolutePath, getUmdEnv } from '../utils';
+import { absolutePath, createEnvironmentHash, getUmdEnv } from '../utils';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
 type Rule = webpack.RuleSetUseItem;
 
@@ -20,26 +21,44 @@ type Rule = webpack.RuleSetUseItem;
 const getWebpackConfig = (mode?: string) => {
   const env = getUmdEnv(mode);
   const isEnvProduction = env.mode == 'production';
-  const filename = isEnvProduction ? '[name].[contenthash:10]' : '[name]';
-  const chunkFilename = isEnvProduction ? '[contenthash:10]' : '[name]';
+  const filename = isEnvProduction ? '[name].[contenthash:8]' : '[name]';
+  const chunkFilename = isEnvProduction ? '[contenthash:8]' : '[name]';
+
+  // postcss-preset-env 只会查找 BROWSERSLIST_ENV | NODE_ENV
+  process.env['NODE_ENV'] = env.mode;
 
   const getStyleLoaders = (...rules: Rule[]): Rule[] => {
     return [
       {
-        loader: MiniCssExtractPlugin.loader,
+        loader: isEnvProduction ? MiniCssExtractPlugin.loader : 'style-loader',
       },
       {
         loader: 'css-loader',
         options: {
-          sourceMap: !isEnvProduction,
+          importLoaders: rules.length + 1,
+          modules: {
+            localIdentName: '[local]-[hash:base64:8]',
+          },
         },
       },
       {
         loader: 'postcss-loader',
         options: {
           postcssOptions: {
-            config: false,
-            plugins: ['postcss-preset-env'],
+            plugins: [
+              'postcss-flexbugs-fixes',
+              [
+                'postcss-preset-env',
+
+                {
+                  autoprefixer: {
+                    flexbox: 'no-2009',
+                  },
+                  stage: 3,
+                },
+              ],
+              'postcss-normalize',
+            ],
           },
         },
       },
@@ -55,27 +74,49 @@ const getWebpackConfig = (mode?: string) => {
     entry: './src/index',
     output: {
       path: env.outputDir,
-      filename: `${filename}.js`,
-      chunkFilename: `${chunkFilename}.js`,
+      filename: `js/${filename}.js`,
+      chunkFilename: `js/${chunkFilename}.js`,
+      assetModuleFilename: `media/[name].[hash:8][ext][query]`,
+      publicPath: env.publicPath,
+    },
+    cache: {
+      type: 'filesystem',
+      version: createEnvironmentHash(env),
+      cacheDirectory: env.cacheDirectory,
+      store: 'pack',
+      buildDependencies: {
+        defaultWebpack: ['webpack/lib/'],
+        config: [__filename],
+      },
+    },
+    infrastructureLogging: {
+      // level: 'none',
     },
     module: {
       // 将缺失的导出提示成错误而不是警告
       strictExportPresence: true,
       rules: [
+        // source-map-loader 目前还没有使用的需要
+        // {
+        //   enforce: 'pre',
+        //   exclude: /@babel(?:\/|\\{1,2})runtime/,
+        //   test: /\.(js|mjs|jsx|ts|tsx|css)$/,
+        //   loader: 'source-map-loader',
+        // },
         {
           oneOf: [
             {
-              test: /\.(t|j)sx?$/,
+              test: /\.(ts|tsx|js|jsx|mjs)$/,
               exclude: /(node_modules)/,
               use: {
                 loader: 'babel-loader',
                 options: {
-                  targets: '> 0.01%',
                   sourceMaps: !isEnvProduction,
                   // 加载源文件本身的sourceMap
                   inputSourceMap: !isEnvProduction,
                   cacheDirectory: true,
                   cacheCompression: false,
+                  compact: isEnvProduction,
                   presets: [
                     [
                       '@babel/preset-env',
@@ -99,6 +140,7 @@ const getWebpackConfig = (mode?: string) => {
                         proposals: true,
                       },
                     ],
+                    ...(isEnvProduction ? [] : [['react-refresh/babel']]),
                   ],
                 },
               },
@@ -115,9 +157,33 @@ const getWebpackConfig = (mode?: string) => {
                   lessOptions: {
                     javascriptEnabled: true,
                   },
-                  sourceMap: !isEnvProduction,
                 },
               }),
+            },
+            {
+              test: /\.s(a|c)ss$/,
+              use: getStyleLoaders({
+                loader: 'sass-loader',
+              }),
+            },
+            {
+              test: /\.(png|jpe?g|svga?|avif|bmp|gif)$/,
+              type: 'asset',
+              parser: {
+                dataUrlCondition: {
+                  // 10 Kb 一下的资源直接用 dataUrl
+                  maxSize: 10 * 1024,
+                },
+              },
+            },
+            {
+              exclude: [/^$/, /\.(html|json|m?jsx?|tsx?)$/],
+              type: 'asset',
+              parser: {
+                dataUrlCondition: {
+                  maxSize: 10 * 1024,
+                },
+              },
             },
           ],
         },
@@ -125,12 +191,13 @@ const getWebpackConfig = (mode?: string) => {
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: `${filename}.css`,
-        chunkFilename: `${chunkFilename}.css`,
+        filename: `css/${filename}.css`,
+        chunkFilename: `css/${chunkFilename}.css`,
       }),
       new HtmlWebpackPlugin({
         template: absolutePath('public/index.html'),
       }),
+      new CleanWebpackPlugin(),
     ],
     resolve: {
       mainFields: ['#source', 'browser', 'module', 'main'],
@@ -144,16 +211,20 @@ const getWebpackConfig = (mode?: string) => {
           extractComments: false,
           terserOptions: {
             compress: {
+              ecma: 5,
               // webpack 默认 配置为2
               // 没必要压缩两遍
               passes: 1,
+              inline: 2,
             },
             mangle: {
               safari10: true,
             },
             output: {
+              ecma: 5,
               // 不生成特殊的注释
               comments: false,
+              ascii_only: true,
             },
           },
         }),

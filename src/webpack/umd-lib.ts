@@ -40,7 +40,6 @@ const getConfig = (mode?: string) => {
               use: {
                 loader: 'babel-loader',
                 options: {
-                  targets: '> 0.01%',
                   sourceMaps: !isEnvProduction,
                   // 加载源文件本身的sourceMap
                   inputSourceMap: !isEnvProduction,
