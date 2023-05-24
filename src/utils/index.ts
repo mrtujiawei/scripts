@@ -37,7 +37,7 @@ export const getUmdEnv = (mode?: string) => {
   const config = require(absolutePath('package.json'))['#buildConfig'];
 
   return {
-    mode: getMode(mode || config.mode),
-    outputDir: getOutputPath(config.outputPath),
+    mode: getMode(mode || config?.mode),
+    outputDir: getOutputPath(config?.outputPath),
   };
 };

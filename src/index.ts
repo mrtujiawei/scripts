@@ -4,22 +4,21 @@ import start from './start';
 import build from './build';
 
 new Command('t-scripts')
-  .addCommand(new Command('start'))
-  .action(() => {
-    start(getUmdConfig());
-  })
+  .addCommand(
+    new Command('start').action(() => {
+      start(getUmdConfig());
+    })
+  )
   .addCommand(
     new Command('build')
       .option('--mode <mode>', 'development | production')
-      .action(({ mode }: { mode?: string }) => {
-        build(getUmdConfig(mode));
+      .option('--lib', '打包成库')
+      .action(({ mode, lib }: { mode?: string; lib?: boolean }) => {
+        if (lib) {
+          build(getUmdLibConfig(mode));
+        } else {
+          build(getUmdConfig(mode));
+        }
       })
-      .addCommand(
-        new Command('lib')
-          .option('--mode <mode>', 'development | production')
-          .action(({ mode }: { mode?: string }) => {
-            build(getUmdLibConfig(mode));
-          })
-      )
   )
   .parse();
