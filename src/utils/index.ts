@@ -53,5 +53,6 @@ export const getUmdEnv = (mode?: string) => {
     outputDir: getOutputPath(config?.outputPath),
     publicPath: getPublicPath(config?.publicPath),
     cacheDirectory: absolutePath('node_modules/.cache'),
+    swSrc: absolutePath('src/service-worker'),
   };
 };

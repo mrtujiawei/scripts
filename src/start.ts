@@ -5,11 +5,15 @@ import { absolutePath } from './utils';
 const start = (config: Configuration) => {
   new WebpackDevServer(
     {
-      compress: false,
+      compress: true,
       historyApiFallback: true,
       static: {
         directory: absolutePath('public'),
         serveIndex: true,
+        watch: {
+          poll: true,
+          ignored: /node_modules/,
+        },
       },
     },
     webpack(config)

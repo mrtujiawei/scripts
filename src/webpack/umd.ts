@@ -5,13 +5,15 @@
  * @author Mr Prince
  * @date 2023-05-24 14:44:57
  */
+import webpack from 'webpack';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import webpack from 'webpack';
-import { absolutePath, createEnvironmentHash, getUmdEnv } from '../utils';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+// import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+// import WorkboxWebpackPlugin from 'workbox-webpack-plugin';
+import { absolutePath, createEnvironmentHash, getUmdEnv } from '../utils';
 
 type Rule = webpack.RuleSetUseItem;
 
@@ -106,7 +108,7 @@ const getWebpackConfig = (mode?: string) => {
         {
           oneOf: [
             {
-              test: /\.(ts|tsx|js|jsx|mjs)$/,
+              test: /\.(tsx?|jsx?|mjs)$/,
               exclude: /(node_modules)/,
               use: {
                 loader: 'babel-loader',
@@ -177,7 +179,10 @@ const getWebpackConfig = (mode?: string) => {
               },
             },
             {
-              exclude: [/^$/, /\.(html|json|m?jsx?|tsx?)$/],
+              exclude: [
+                /^$/,
+                /\.(html|json|jsx?|tsx?|mjs|css|less|s(a|c)ss|png|jpe?g|svga?|avif|bmp|gif)$/,
+              ],
               type: 'asset',
               parser: {
                 dataUrlCondition: {
@@ -196,8 +201,118 @@ const getWebpackConfig = (mode?: string) => {
       }),
       new HtmlWebpackPlugin({
         template: absolutePath('public/index.html'),
+        // 参数注入
+        // templateParameters: {
+        //   title: '标题'
+        // }
       }),
       new CleanWebpackPlugin(),
+      // moment 导入限制
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^\.\/locale$/,
+        contextRegExp: /moment$/,
+      }),
+
+      // 生成文件清单
+      // new WebpackManifestPlugin({
+      //   // fileName: 'asset-manifest.json',
+      //   publicPath: env.publicPath,
+      //   generate(seed, files, entries) {
+      //     const manifestFiles = files.reduce((manifest, file) => {
+      //       manifest[file.name] = file.path;
+      //       return manifest;
+      //     }, seed);
+      //     const entrypointFiles = entries?.['main']?.filter(
+      //       (fileName) => !fileName.endsWith('.map')
+      //     );
+      //
+      //     return {
+      //       files: manifestFiles,
+      //       entrypoints: entrypointFiles,
+      //     };
+      //   },
+      // }),
+
+      // 注入 manifest.json
+      // new WorkboxWebpackPlugin.InjectManifest({
+      //   swSrc: '',
+      //   dontCacheBustURLsMatching: /\.[0-9a-f]{8}\./,
+      //   exclude: [/\.map$/, /manifest\.json$/, /LICENSE/],
+      //   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      // }),
+      // 编辑器检查，而不是打包工具
+      // new ForkTsCheckerWebpackPlugin({
+      //   async: isEnvDevelopment,
+      //   typescript: {
+      //     typescriptPath: resolve.sync('typescript', {
+      //       basedir: paths.appNodeModules,
+      //     }),
+      //     configOverwrite: {
+      //       compilerOptions: {
+      //         sourceMap: isEnvProduction
+      //           ? shouldUseSourceMap
+      //           : isEnvDevelopment,
+      //         skipLibCheck: true,
+      //         inlineSourceMap: false,
+      //         declarationMap: false,
+      //         noEmit: true,
+      //         incremental: true,
+      //         tsBuildInfoFile: paths.appTsBuildInfoFile,
+      //       },
+      //     },
+      //     context: paths.appPath,
+      //     diagnosticOptions: {
+      //       syntactic: true,
+      //     },
+      //     mode: 'write-references',
+      //     // profile: true,
+      //   },
+      //   issue: {
+      //     // This one is specifically to match during CI tests,
+      //     // as micromatch doesn't match
+      //     // '../cra-template-typescript/template/src/App.tsx'
+      //     // otherwise.
+      //     include: [
+      //       { file: '../**/src/**/*.{ts,tsx}' },
+      //       { file: '**/src/**/*.{ts,tsx}' },
+      //     ],
+      //     exclude: [
+      //       { file: '**/src/**/__tests__/**' },
+      //       { file: '**/src/**/?(*.){spec|test}.*' },
+      //       { file: '**/src/setupProxy.*' },
+      //       { file: '**/src/setupTests.*' },
+      //     ],
+      //   },
+      //   logger: {
+      //     infrastructure: 'silent',
+      //   },
+      // }),
+
+      // eslint 暂时不需要
+      // new ESLintPlugin({
+      //   // Plugin options
+      //   extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
+      //   formatter: require.resolve('react-dev-utils/eslintFormatter'),
+      //   eslintPath: require.resolve('eslint'),
+      //   failOnError: !(isEnvDevelopment && emitErrorsAsWarnings),
+      //   context: paths.appSrc,
+      //   cache: true,
+      //   cacheLocation: path.resolve(
+      //     paths.appNodeModules,
+      //     '.cache/.eslintcache'
+      //   ),
+      //   // ESLint class options
+      //   cwd: paths.appPath,
+      //   resolvePluginsRelativeTo: __dirname,
+      //   baseConfig: {
+      //     extends: [require.resolve('eslint-config-react-app/base')],
+      //     rules: {
+      //       ...(!hasJsxRuntime && {
+      //         'react/react-in-jsx-scope': 'error',
+      //       }),
+      //     },
+      //   },
+      // }),
     ],
     resolve: {
       mainFields: ['#source', 'browser', 'module', 'main'],
