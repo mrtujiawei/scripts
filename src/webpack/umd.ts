@@ -152,6 +152,7 @@ const getWebpackConfig = (mode?: string) => {
             },
             {
               test: /\.(tsx?|jsx?|mjs)$/,
+              exclude: absolutePath('src'),
               use: {
                 loader: 'babel-loader',
                 options: {
@@ -162,22 +163,14 @@ const getWebpackConfig = (mode?: string) => {
                   cacheCompression: false,
                   compact: isEnvProduction,
                   presets: [
+                    ['@babel/preset-env'],
                     [
-                      [
-                        '@babel/preset-env',
-                        // {
-                        //   useBuiltIns: 'usage',
-                        //   corejs: '3.30.2',
-                        // },
-                      ],
-                      // [
-                      //   '@babel/preset-react',
-                      //   {
-                      //     runtime: 'automatic',
-                      //   },
-                      // ],
-                      // '@babel/preset-typescript',
+                      '@babel/preset-react',
+                      {
+                        runtime: 'automatic',
+                      },
                     ],
+                    '@babel/preset-typescript',
                   ],
                   plugins: [
                     [
@@ -187,7 +180,6 @@ const getWebpackConfig = (mode?: string) => {
                         proposals: true,
                       },
                     ],
-                    ...(isEnvProduction ? [] : [['react-refresh/babel']]),
                   ],
                 },
               },
