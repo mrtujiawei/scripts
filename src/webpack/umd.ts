@@ -124,10 +124,10 @@ const getWebpackConfig = (mode?: string) => {
                   presets: [
                     [
                       '@babel/preset-env',
-                      // {
-                      // useBuiltIns: 'usage',
-                      // corejs: '3.30.2',
-                      // },
+                      {
+                        useBuiltIns: 'entry',
+                        corejs: '3.30.2',
+                      },
                     ],
                     [
                       '@babel/preset-react',
@@ -141,7 +141,6 @@ const getWebpackConfig = (mode?: string) => {
                     [
                       '@babel/plugin-transform-runtime',
                       {
-                        corejs: 3,
                         proposals: true,
                       },
                     ],
@@ -163,7 +162,13 @@ const getWebpackConfig = (mode?: string) => {
                   cacheCompression: false,
                   compact: isEnvProduction,
                   presets: [
-                    ['@babel/preset-env'],
+                    [
+                      '@babel/preset-env',
+                      {
+                        useBuiltIns: 'entry',
+                        corejs: '3.30.2',
+                      },
+                    ],
                     [
                       '@babel/preset-react',
                       {
@@ -176,7 +181,6 @@ const getWebpackConfig = (mode?: string) => {
                     [
                       '@babel/plugin-transform-runtime',
                       {
-                        corejs: 3,
                         proposals: true,
                       },
                     ],
