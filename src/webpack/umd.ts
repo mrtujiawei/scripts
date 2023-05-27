@@ -109,10 +109,12 @@ const getWebpackConfig = (mode?: string) => {
           oneOf: [
             {
               test: /\.(tsx?|jsx?|mjs)$/,
-              exclude: /(node_modules)/,
+              include: absolutePath('src'),
+              // exclude: /(node_modules)/,
               use: {
                 loader: 'babel-loader',
                 options: {
+                  // sourceType: 'unambiguous',
                   sourceMaps: !isEnvProduction,
                   // 加载源文件本身的sourceMap
                   inputSourceMap: !isEnvProduction,
@@ -122,10 +124,10 @@ const getWebpackConfig = (mode?: string) => {
                   presets: [
                     [
                       '@babel/preset-env',
-                      {
-                        useBuiltIns: 'usage',
-                        corejs: '3.30.2',
-                      },
+                      // {
+                      // useBuiltIns: 'usage',
+                      // corejs: '3.30.2',
+                      // },
                     ],
                     [
                       '@babel/preset-react',
@@ -139,6 +141,49 @@ const getWebpackConfig = (mode?: string) => {
                     [
                       '@babel/plugin-transform-runtime',
                       {
+                        corejs: 3,
+                        proposals: true,
+                      },
+                    ],
+                    ...(isEnvProduction ? [] : [['react-refresh/babel']]),
+                  ],
+                },
+              },
+            },
+            {
+              test: /\.(tsx?|jsx?|mjs)$/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  sourceType: 'unambiguous',
+                  sourceMaps: !isEnvProduction,
+                  inputSourceMap: !isEnvProduction,
+                  cacheDirectory: true,
+                  cacheCompression: false,
+                  compact: isEnvProduction,
+                  presets: [
+                    [
+                      [
+                        '@babel/preset-env',
+                        // {
+                        //   useBuiltIns: 'usage',
+                        //   corejs: '3.30.2',
+                        // },
+                      ],
+                      // [
+                      //   '@babel/preset-react',
+                      //   {
+                      //     runtime: 'automatic',
+                      //   },
+                      // ],
+                      // '@babel/preset-typescript',
+                    ],
+                  ],
+                  plugins: [
+                    [
+                      '@babel/plugin-transform-runtime',
+                      {
+                        corejs: 3,
                         proposals: true,
                       },
                     ],
@@ -325,6 +370,9 @@ const getWebpackConfig = (mode?: string) => {
           // 注释不单独生成一个文件
           extractComments: false,
           terserOptions: {
+            parse: {
+              ecma: 2017,
+            },
             compress: {
               ecma: 5,
               // webpack 默认 配置为2

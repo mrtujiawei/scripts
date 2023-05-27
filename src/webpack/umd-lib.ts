@@ -49,8 +49,10 @@ const getConfig = (mode?: string) => {
                     [
                       '@babel/preset-env',
                       {
-                        useBuiltIns: 'usage',
-                        corejs: '3.30.2',
+                        // 如果用了 @babel/plugin-transform-runtime
+                        // 不应该设置 useBuiltIns
+                        // useBuiltIns: 'usage',
+                        // corejs: '3.30.2',
                       },
                     ],
                     [
@@ -65,6 +67,7 @@ const getConfig = (mode?: string) => {
                     [
                       '@babel/plugin-transform-runtime',
                       {
+                        corejs: 3,
                         proposals: true,
                       },
                     ],
