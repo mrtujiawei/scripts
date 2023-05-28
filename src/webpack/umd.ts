@@ -40,6 +40,7 @@ const getWebpackConfig = (mode?: string) => {
         options: {
           importLoaders: rules.length + 1,
           modules: {
+            auto: true,
             localIdentName: '[local]-[hash:base64:8]',
           },
         },
