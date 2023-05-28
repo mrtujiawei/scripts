@@ -11,6 +11,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 // import WorkboxWebpackPlugin from 'workbox-webpack-plugin';
 import { absolutePath, createEnvironmentHash, getUmdEnv } from '../utils';
@@ -253,6 +254,12 @@ const getWebpackConfig = (mode?: string) => {
         resourceRegExp: /^\.\/locale$/,
         contextRegExp: /moment$/,
       }),
+
+      ...[
+        new ReactRefreshWebpackPlugin({
+          overlay: false,
+        }),
+      ].filter(() => !isEnvProduction),
 
       // 生成文件清单
       // new WebpackManifestPlugin({
