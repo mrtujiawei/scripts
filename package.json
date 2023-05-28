@@ -1,6 +1,6 @@
 {
   "name": "@mrtujiawei/scripts",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "打包脚本",
   "bin": {
     "t-scripts": "bin/index.js"
