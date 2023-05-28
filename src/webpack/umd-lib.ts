@@ -7,7 +7,7 @@
  */
 import webpack from 'webpack';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
-import { getLibEnv } from '../utils';
+import { createEnvironmentHash, getLibEnv } from '../utils';
 
 const getConfig = (mode?: string) => {
   const env = getLibEnv(mode);
@@ -26,6 +26,16 @@ const getConfig = (mode?: string) => {
       library: {
         type: 'umd',
         name: env.libName,
+      },
+    },
+    cache: {
+      type: 'filesystem',
+      version: createEnvironmentHash(env),
+      cacheDirectory: env.cacheDirectory,
+      store: 'pack',
+      buildDependencies: {
+        defaultWebpack: ['webpack/lib/'],
+        config: [__filename],
       },
     },
     module: {

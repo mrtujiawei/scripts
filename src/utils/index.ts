@@ -1,6 +1,7 @@
 import path from 'path';
 import { MODE } from '../enums';
 import { createHash } from 'crypto';
+import { getUmdLibConfig } from '../webpack';
 
 export const absolutePath = (...paths: string[]) => {
   return path.resolve(process.cwd(), ...paths);
@@ -30,6 +31,7 @@ export const getLibEnv = (mode?: string) => {
   return {
     mode: getMode(mode || config?.mode),
     libName: getLibName(config.libName),
+    cacheDirectory: absolutePath('node_modules/.cache'),
     outputDir: getOutputPath(config.outputPath),
   };
 };
@@ -38,7 +40,9 @@ export const getPublicPath = (publicPath?: string) => {
   return publicPath || '/';
 };
 
-export const createEnvironmentHash = (env: ReturnType<typeof getUmdEnv>) => {
+export const createEnvironmentHash = (
+  env: ReturnType<typeof getUmdEnv | typeof getUmdLibConfig>
+) => {
   const hash = createHash('md5');
   hash.update(JSON.stringify(env));
 
