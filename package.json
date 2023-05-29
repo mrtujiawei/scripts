@@ -36,6 +36,7 @@
     "@babel/preset-typescript": "7.21.5",
     "@babel/runtime-corejs3": "7.22.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.10",
+    "autoprefixer": "10.4.14",
     "babel-loader": "9.1.2",
     "clean-webpack-plugin": "4.0.0",
     "commander": "10.0.1",
@@ -74,6 +75,7 @@
     "@types/gulp-less": "0.0.33",
     "@types/gulp-postcss": "8.0.3",
     "@types/gulp-rename": "2.0.2",
-    "@types/node": "20.2.3"
+    "@types/node": "20.2.3",
+    "browserslist": "4.21.7"
   }
 }
