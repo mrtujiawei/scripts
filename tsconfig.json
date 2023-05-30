@@ -31,7 +31,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["ESNext"]
   },
   "include": ["src"],
   "ts-node": {
