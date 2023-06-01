@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { config } from 'dotenv';
 import { getUmdConfig, getUmdLibConfig } from './webpack';
 import start from './start';
 import build from './build';
@@ -24,6 +25,7 @@ new Command('t-scripts')
       .option('--less', '打包 less')
       .option('--css', '打包 css')
       .action(({ mode, lib, css, less }: Options) => {
+        config({ override: false });
         if (lib) {
           build(getUmdLibConfig(mode));
         }
