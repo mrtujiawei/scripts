@@ -5,7 +5,7 @@
  * @author Mr Prince
  * @date 2023-05-24 14:44:57
  */
-import webpack, { DefinePlugin } from 'webpack';
+import webpack from 'webpack';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -261,8 +261,6 @@ const getWebpackConfig = (mode?: string) => {
           overlay: false,
         }),
       ].filter(() => !isEnvProduction),
-
-      new DefinePlugin(env.env),
 
       // 生成文件清单
       // new WebpackManifestPlugin({

@@ -2,12 +2,6 @@ import path from 'path';
 import { MODE } from '../enums';
 import { createHash } from 'crypto';
 import { getUmdLibConfig } from '../webpack';
-import { config } from 'dotenv';
-
-export const getEnvConfig = () => {
-  const result = config({ override: false });
-  return result.parsed || {};
-};
 
 export const absolutePath = (...paths: string[]) => {
   return path.resolve(process.cwd(), ...paths);
@@ -64,6 +58,5 @@ export const getUmdEnv = (mode?: string) => {
     publicPath: getPublicPath(config?.publicPath),
     cacheDirectory: absolutePath('node_modules/.cache'),
     swSrc: absolutePath('src/service-worker'),
-    env: getEnvConfig(),
   };
 };
