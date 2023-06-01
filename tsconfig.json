@@ -34,10 +34,5 @@
     "skipLibCheck": true,
     "lib": ["ESNext"]
   },
-  "include": ["src"],
-  "ts-node": {
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  }
+  "include": ["src"]
 }
