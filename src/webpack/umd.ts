@@ -146,8 +146,8 @@ const getWebpackConfig = (mode?: string) => {
                       {
                         // Vue 需要
                         allExtensions: true,
-                      }
-                    ]
+                      },
+                    ],
                   ],
                   plugins: [
                     [
