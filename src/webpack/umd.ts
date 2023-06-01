@@ -12,6 +12,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { VueLoaderPlugin } from 'vue-loader';
 // import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 // import WorkboxWebpackPlugin from 'workbox-webpack-plugin';
 import { absolutePath, createEnvironmentHash, getUmdEnv } from '../utils';
@@ -129,6 +130,9 @@ const getWebpackConfig = (mode?: string) => {
                       {
                         useBuiltIns: 'entry',
                         corejs: '3.30.2',
+                        // VUe 需要，但我没打开
+                        // forceAllTransforms: true,
+                        // modules: false,
                       },
                     ],
                     [
@@ -137,7 +141,13 @@ const getWebpackConfig = (mode?: string) => {
                         runtime: 'automatic',
                       },
                     ],
-                    '@babel/preset-typescript',
+                    [
+                      '@babel/preset-typescript',
+                      {
+                        // Vue 需要
+                        allExtensions: true,
+                      }
+                    ]
                   ],
                   plugins: [
                     [
@@ -189,6 +199,10 @@ const getWebpackConfig = (mode?: string) => {
                   ],
                 },
               },
+            },
+            {
+              test: /\.vue$/,
+              loader: 'vue-loader',
             },
             {
               test: /\.css$/,
@@ -261,6 +275,8 @@ const getWebpackConfig = (mode?: string) => {
           overlay: false,
         }),
       ].filter(() => !isEnvProduction),
+
+      new VueLoaderPlugin(),
 
       // 生成文件清单
       // new WebpackManifestPlugin({
